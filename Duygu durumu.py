@@ -8,7 +8,7 @@ import cv2
 import joblib
 from kaggle.api.kaggle_api_extended import KaggleApi
 
-# Adım 1: Kaggle'dan veri setini indir
+# Veri seti indirme
 def download_dataset():
     api = KaggleApi()
     api.authenticate()
@@ -20,9 +20,9 @@ def download_dataset():
     else:
         print("Veri seti zaten mevcut.")
 
-# Adım 2: Veri setini yükle ve işle
+# Veri setini yyükleme ve çalıştırma
 def prepare_data():
-    csv_file = "C:/Users/emine/.kaggle/fer2013.csv"  # CSV dosyasının doğru yolu
+    csv_file = "C:/Users/emine/.kaggle/fer2013.csv"  # Dosyayı kaydettiğiniz yol
     print("Veriler işleniyor...")
     try:
         data = pd.read_csv(csv_file)
@@ -32,7 +32,7 @@ def prepare_data():
 
     print(f"Veri seti başarıyla yüklendi! İlk birkaç örnek:\n{data.head()}")
 
-    # Duygu etiketlerini sadeleştir
+    # Duygu etiketlerini sadeleştirme bunu kaggle dosyasındaki resimleri inceleyeyek çoğaltabilirsiniz
     emotion_mapping = {
         0: "mutlu", 1: "mutlu", 2: "uzgun", 3: "mutlu", 
         4: "uzgun", 5: "sinirli", 6: "sinirli"
@@ -47,7 +47,7 @@ def prepare_data():
     y = data['emotion']
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Adım 3: Modeli eğit ve kaydet
+# Modülü eğitme 
 def train_model(X_train, X_test, y_train, y_test):
     print("Model eğitiliyor...")
     model = RandomForestClassifier(n_estimators=100, random_state=42)
@@ -58,13 +58,13 @@ def train_model(X_train, X_test, y_train, y_test):
     print("Doğruluk Skoru:", accuracy_score(y_test, y_pred))
     print("Sınıflandırma Raporu:\n", classification_report(y_test, y_pred))
 
-    # Modeli kaydet
+    # Modeli kaydetme
     model_path = "duygu_modeli.pkl"
     joblib.dump(model, model_path)
     print(f"Model {model_path} dosyasına kaydedildi.")
     return model_path
 
-# Adım 4: OpenCV ile duygu analizi yap
+# OPENCV İLE DUYGU ANALİZİİ KISMI 
 def real_time_emotion_analysis(model_path):
     print("Gerçek zamanlı duygu analizi başlatılıyor...")
     model = joblib.load(model_path)
@@ -81,7 +81,7 @@ def real_time_emotion_analysis(model_path):
 
         for (x, y, w, h) in faces:
             face = gray[y:y+h, x:x+w]
-            face_resized = cv2.resize(face, (48, 48)).flatten().reshape(1, -1) / 255.0  # Normalize
+            face_resized = cv2.resize(face, (48, 48)).flatten().reshape(1, -1) / 255.0  
             emotion = model.predict(face_resized)[0]
 
             # Çizim ve duygu etiketi
@@ -95,12 +95,12 @@ def real_time_emotion_analysis(model_path):
     cap.release()
     cv2.destroyAllWindows()
 
-# Tüm süreci çalıştır
+# Tüm süreci çalıştırma
 if __name__ == "__main__":
     # Kaggle API ayarı: .kaggle dizinini kontrol edin
     os.environ['KAGGLE_CONFIG_DIR'] = r"C:/Users/emine/.kaggle"
 
-    # Adımları sırayla çalıştır
+    # Adımları sırayla çalıştırma
     download_dataset()
     X_train, X_test, y_train, y_test = prepare_data()
     
